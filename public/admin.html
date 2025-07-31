@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel Administrativo</title>
+  <style>
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      background-color: #000;
+      border-bottom: 2px solid #f0d070;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    header img.logo {
+      height: 60px;
+      cursor: pointer;
+    }
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    body {
+      background-color: #1e1e1e;
+      color: #f0d070;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin: 0;
+      }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    input, select, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 5px;
+    }
+    input, select {
+      background-color: #3a3a3a;
+      color: #fff;
+    }
+    button {
+      background-color: #f0d070;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .list-item {
+      background-color: #3a3a3a;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .list-item span {
+      display: inline-block;
+      width: 60%;
+    }
+    .list-item input[type="number"] {
+      width: 30%;
+      margin-left: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img
+        class="logo"
+        src="LOGOTIPO - STYLER PLANNER.png"
+        alt="Logo"
+        onclick="window.location.href='index.html'"
+      />
+      <h1>Painel Administrativo</h1>
+    </div>
+    <div class="header-buttons">
+      <button onclick="logout()">Sair</button>
+      <button onclick="window.location.href='index.html'">Voltar</button>
+    </div>
+  </header>
+
+<body>
+  <!-- Tela de Login -->
+  <div class="container" id="login-screen">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Usuário" />
+    <input type="password" id="password" placeholder="Senha" />
+    <button onclick="login()">Entrar</button>
+    <p>Realizar cadastro <a href="#" onclick="showOnly('register-screen')">Cadastrar</a></p>
+  </div>
+
+  <!-- Tela de Cadastro -->
+  <div class="container hidden" id="register-screen">
+    <h2>Cadastro</h2>
+    <input type="text" id="new-username" placeholder="Usuário" />
+    <input type="email" id="new-email" placeholder="E-mail" />
+    <input type="password" id="new-password" placeholder="Senha" />
+    <button onclick="register()">Cadastrar</button>
+    <p>Já tem uma conta? <a href="#" onclick="showOnly('login-screen')">Entrar</a></p>
+  </div>
+
+  <!-- Conteúdo principal protegido -->
+  <div class="container hidden" id="main-content">
+    <h2>Serviços</h2>
+    <input type="text" id="novo-servico" placeholder="Nome do Serviço (ex: Corte)" />
+    <input type="number" id="preco-servico" placeholder="Preço (ex: 30)" />
+    <input type="file" id="imagem-servico" accept="image/*" />
+    <button onclick="adicionarServico()">Adicionar Serviço</button>
+    <div id="lista-servicos"></div>
+  </div>
+
+  <div class="container hidden" id="horarios-content">
+    <h2>Horários Disponíveis</h2>
+    <input type="date" id="data-horario" />
+    <input type="time" id="hora-horario" />
+    <select id="barbearia-horario">
+      <option value="Barbearia do João">Barbearia do João</option>
+    </select>
+    <button onclick="adicionarHorario()">Adicionar Horário</button>
+    <div id="lista-horarios"></div>
+  </div>
+
+  <script>
+    let modoEdicao = false;
+    let indexEdicao = null;
+    let modoEdicaoHorario = false;
+    let indexEdicaoHorario = null;
+
+    function showOnly(screenId) {
+      document.querySelectorAll(".container").forEach((el) => el.classList.add("hidden"));
+      document.getElementById(screenId).classList.remove("hidden");
+    }
+
+    function register() {
+      const u = document.getElementById("new-username").value.trim();
+      const p = document.getElementById("new-password").value.trim();
+      const e = document.getElementById("new-email").value.trim();
+      if (!u || !p || !e) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+      localStorage.setItem("user", JSON.stringify({ user: u, pass: p, email: e }));
+      alert("✅ Cadastro realizado com sucesso!");
+      showOnly("login-screen");
+    }
+
+    function login() {
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value.trim();
+      const st = JSON.parse(localStorage.getItem("user") || "{}");
+      if (st.user === u && st.pass === p) {
+        localStorage.setItem("logado", "true");
+        showOnly("main-content");
+        document.getElementById("horarios-content").classList.remove("hidden");
+        renderizarServicos();
+        const data = document.getElementById("data-horario").value;
+        if (data) exibirHorariosPorData(data);
+      } else {
+        alert("❌ Usuário ou senha incorretos");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("logado");
+      showOnly("login-screen");
+    }
+
+    function salvarServicos(servicos) {
+      localStorage.setItem("servicos", JSON.stringify(servicos));
+      renderizarServicos();
+    }
+
+    function adicionarServico() {
+      const nome = document.getElementById("novo-servico").value.trim();
+      const preco = parseFloat(document.getElementById("preco-servico").value);
+      const inputImg = document.getElementById("imagem-servico");
+      const file = inputImg.files[0];
+
+      if (!nome || isNaN(preco)) {
+        alert("Preencha nome e preço.");
+        return;
+      }
+
+      const servicos = JSON.parse(localStorage.getItem("servicos") || "[]");
+
+      if (modoEdicao && !file) {
+        servicos[indexEdicao].name = nome;
+        servicos[indexEdicao].price = preco;
+        salvarServicos(servicos);
+        limparFormulario();
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const imgBase64 = e.target.result;
+
+        if (modoEdicao) {
+          servicos[indexEdicao] = { name: nome, price: preco, img: imgBase64 };
+          modoEdicao = false;
+          indexEdicao = null;
+        } else {
+          servicos.push({ name: nome, price: preco, img: imgBase64 });
+        }
+
+        salvarServicos(servicos);
+        limparFormulario();
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      } else if (!modoEdicao) {
+        alert("Selecione uma imagem para o serviço.");
+      }
+    }
+
+    function editarServico(index) {
+      const servicos = JSON.parse(localStorage.getItem("servicos") || "[]");
+      const servico = servicos[index];
+      document.getElementById("novo-servico").value = servico.name;
+      document.getElementById("preco-servico").value = servico.price;
+      alert("Edite os campos e clique em 'Adicionar Serviço' para salvar.");
+      modoEdicao = true;
+      indexEdicao = index;
+    }
+
+    function excluirServico(index) {
+      if (!confirm("Tem certeza que deseja excluir este serviço?")) return;
+      const servicos = JSON.parse(localStorage.getItem("servicos") || "[]");
+      servicos.splice(index, 1);
+      salvarServicos(servicos);
+    }
+
+    function limparFormulario() {
+      document.getElementById("novo-servico").value = "";
+      document.getElementById("preco-servico").value = "";
+      document.getElementById("imagem-servico").value = "";
+      modoEdicao = false;
+      indexEdicao = null;
+    }
+
+    function renderizarServicos() {
+      const servicos = JSON.parse(localStorage.getItem("servicos") || "[]");
+      const container = document.getElementById("lista-servicos");
+      container.innerHTML = "";
+
+      servicos.forEach((s, i) => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px">
+            <img src="${s.img}" style="width:50px; height:50px; border-radius:6px; object-fit:cover" />
+            <div>
+              <strong>${s.name}</strong><br />
+              R$ ${s.price.toFixed(2).replace(".", ",")}
+            </div>
+          </div>
+          <div style="margin-top:10px; display:flex; gap:10px">
+            <button onclick="editarServico(${i})">✏️ Editar</button>
+            <button onclick="excluirServico(${i})">🗑️ Excluir</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function adicionarHorario() {
+      const data = document.getElementById("data-horario").value;
+      const hora = document.getElementById("hora-horario").value;
+      const barbearia = document.getElementById("barbearia-horario").value;
+      if (!data || !hora || !barbearia) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+      const horarios = JSON.parse(localStorage.getItem("horariosDisponiveis") || "[]");
+
+      if (modoEdicaoHorario) {
+        horarios[indexEdicaoHorario] = { data, hora, barbearia };
+        modoEdicaoHorario = false;
+        indexEdicaoHorario = null;
+      } else {
+        horarios.push({ data, hora, barbearia });
+      }
+
+      localStorage.setItem("horariosDisponiveis", JSON.stringify(horarios));
+      exibirHorariosPorData(data);
+    }
+
+    function excluirHorario(index) {
+      if (!confirm("Excluir este horário?")) return;
+      const horarios = JSON.parse(localStorage.getItem("horariosDisponiveis") || "[]");
+      const removido = horarios[index];
+      horarios.splice(index, 1);
+      localStorage.setItem("horariosDisponiveis", JSON.stringify(horarios));
+
+      const gerados = gerarHorariosAutomaticos(removido.data, removido.barbearia);
+      const ehGeradoAutomaticamente = gerados.some(
+        (h) => h.hora === removido.hora && h.barbearia === removido.barbearia
+      );
+
+      if (ehGeradoAutomaticamente) {
+        const horariosExcluidos = JSON.parse(localStorage.getItem("horariosExcluidos") || "[]");
+        horariosExcluidos.push(removido);
+        localStorage.setItem("horariosExcluidos", JSON.stringify(horariosExcluidos));
+      }
+
+      exibirHorariosPorData(removido.data);
+    }
+
+    function editarHorario(index) {
+      const horarios = JSON.parse(localStorage.getItem("horariosDisponiveis") || "[]");
+      const h = horarios[index];
+      document.getElementById("data-horario").value = h.data;
+      document.getElementById("hora-horario").value = h.hora;
+      document.getElementById("barbearia-horario").value = h.barbearia;
+      modoEdicaoHorario = true;
+      indexEdicaoHorario = index;
+      exibirHorariosPorData(h.data);
+    }
+
+    function exibirHorariosPorData(dataSelecionada) {
+      const lista = document.getElementById("lista-horarios");
+      const horariosSalvos = JSON.parse(localStorage.getItem("horariosDisponiveis") || "[]");
+      let horariosDoDia = horariosSalvos.filter(h => h.data === dataSelecionada);
+
+      if (horariosDoDia.length === 0) {
+        const diaSemana = new Date(dataSelecionada).getDay();
+        let horariosGerados = [];
+
+        if (diaSemana === 0) {
+          lista.innerHTML = "<p>Domingo não possui horários disponíveis.</p>";
+          return;
+        }
+
+        const horaInicial = 9;
+        const horaFinal = diaSemana === 6 ? 12 : 18;
+
+        for (let h = horaInicial; h < horaFinal; h++) {
+          horariosGerados.push(`${h.toString().padStart(2, "0")}:00`);
+          horariosGerados.push(`${h.toString().padStart(2, "0")}:30`);
+        }
+
+        const barbeariaSelecionada = document.getElementById("barbearia-horario").value || "Barbearia do João";
+        horariosDoDia = horariosGerados.map(hora => ({ data: dataSelecionada, hora, barbearia: barbeariaSelecionada }));
+
+        const novosHorarios = [...horariosSalvos, ...horariosDoDia];
+        localStorage.setItem("horariosDisponiveis", JSON.stringify(novosHorarios));
+      }
+
+      lista.innerHTML = "";
+      horariosDoDia.forEach((h, i) => {
+        const indexOriginal = horariosSalvos.findIndex(
+          hs => hs.data === h.data && hs.hora === h.hora && hs.barbearia === h.barbearia
+        );
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+          ${h.data} - ${h.hora} (${h.barbearia})<br>
+          <button onclick="editarHorario(${indexOriginal})">✏️ Editar</button>
+          <button onclick="excluirHorario(${indexOriginal})">🗑️ Excluir</button>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function gerarHorariosAutomaticos(data, barbearia) {
+      const horariosGerados = [];
+      const [ano, mes, dia] = data.split("-");
+      const dataObj = new Date(ano, mes - 1, dia);
+      const diaSemana = dataObj.getDay();
+      if (diaSemana === 0) return [];
+
+      const horaInicio = 9;
+      const horaFim = diaSemana === 6 ? 12 : 18;
+
+      for (let h = horaInicio; h < horaFim; h++) {
+        for (let m = 0; m < 60; m += 30) {
+          const horaFormatada = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+          horariosGerados.push({ data, hora: horaFormatada, barbearia });
+        }
+      }
+
+      const horariosExcluidos = JSON.parse(localStorage.getItem("horariosExcluidos") || "[]");
+      return horariosGerados.filter(h =>
+        !horariosExcluidos.some(ex => ex.data === h.data && ex.hora === h.hora && ex.barbearia === h.barbearia)
+      );
+    }
+
+    function gerarHorariosPadraoProximosDias(dias = 30) {
+      const horariosExistentes = JSON.parse(localStorage.getItem("horariosDisponiveis") || "[]");
+      const horariosExcluidos = JSON.parse(localStorage.getItem("horariosExcluidos") || "[]");
+      const novosHorarios = [];
+      const barbearia = "Barbearia do João";
+
+      for (let i = 0; i < dias; i++) {
+        const dataObj = new Date();
+        dataObj.setDate(dataObj.getDate() + i);
+        const ano = dataObj.getFullYear();
+        const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
+        const dia = String(dataObj.getDate()).padStart(2, "0");
+        const dataStr = `${ano}-${mes}-${dia}`;
+        const diaSemana = dataObj.getDay();
+        if (diaSemana === 0) continue;
+
+        const horaInicial = 9;
+        const horaFinal = diaSemana === 6 ? 12 : 18;
+
+        for (let h = horaInicial; h < horaFinal; h++) {
+          const horariosGerar = [`${String(h).padStart(2, "0")}:00`, `${String(h).padStart(2, "0")}:30`];
+          horariosGerar.forEach((hora) => {
+            const horario = { data: dataStr, hora, barbearia };
+            const jaExiste = horariosExistentes.some(ex => ex.data === dataStr && ex.hora === hora && ex.barbearia === barbearia);
+            const foiExcluido = horariosExcluidos.some(ex => ex.data === dataStr && ex.hora === hora && ex.barbearia === barbearia);
+            if (!jaExiste && !foiExcluido) novosHorarios.push(horario);
+          });
+        }
+      }
+
+      if (novosHorarios.length > 0) {
+        const atualizados = [...horariosExistentes, ...novosHorarios];
+        localStorage.setItem("horariosDisponiveis", JSON.stringify(atualizados));
+      }
+    }
+
+    document.getElementById("data-horario").addEventListener("input", (e) => {
+      exibirHorariosPorData(e.target.value);
+    });
+
+    window.addEventListener("load", () => {
+      gerarHorariosPadraoProximosDias();
+      const logado = localStorage.getItem("logado") === "true";
+      if (logado) {
+        showOnly("main-content");
+        document.getElementById("horarios-content").classList.remove("hidden");
+        renderizarServicos();
+        const dataInicial = document.getElementById("data-horario").value;
+        if (dataInicial) exibirHorariosPorData(dataInicial);
+      } else {
+        showOnly("login-screen");
+      }
+    });
+  </script>
+</body>
+</html>

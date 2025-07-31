@@ -1,0 +1,312 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #000000, #1a1a1a);
+  color: #f0d070;
+  padding-top: 80px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px; /* já é suficiente */
+  background: #000000;
+  border-bottom: 2px solid #f0d070;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 97%;
+  z-index: 1000;
+}
+
+header img.logo {
+  height: 60px;
+  cursor: pointer;
+}
+#services-buttons {
+  display: .hidden;
+}
+.time-slot {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #f0d070;
+  cursor: pointer;
+  border-radius: 6px;
+  display: inline-block;
+}
+.time-slot.selected {
+  background-color: #f0d070;
+  color: black;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 900px;
+  margin: 100px auto;
+  background: #111;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  display: none;
+}
+.container.active {
+  display: block;
+}
+h2 {
+  text-align: center;
+  color: #f0d070;
+}
+.barbershop-list,
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.barbershop-card,
+.service-card {
+  background: #222;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+.barbershop-card:hover,
+.service-card:hover {
+  box-shadow: 0 0 10px #f0d070;
+}
+.service-card.selected {
+  box-shadow: 0 0 10px 2px #f0d070;
+}
+.barbershop-card img,
+.service-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 2px solid #f0d070;
+  transition: transform 0.3s ease;
+}
+.service-card img:hover {
+  transform: scale(1.5);
+  z-index: 100;
+}
+.calendar,
+.confirmation,
+.services,
+.barbershop-screen {
+  display: none;
+}
+.calendar.active,
+.confirmation.active,
+.services.active,
+.barbershop-screen.active {
+  display: block;
+}
+.time-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.time-slot {
+  background: #333;
+  color: #f0d070;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.time-slot.selected {
+  background: #f0d070;
+  color: #000;
+}
+input,
+label {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #222;
+  color: #f0d070;
+}
+button {
+  padding: 12px;
+  background: #f0d070;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  width: 100%;
+}
+.total-container {
+  text-align: right;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #f0d070;
+}
+footer {
+  background: #000000;
+  color: #f0d070;
+  text-align: center;
+  padding: 20px;
+  margin-top: 50px;
+  border-top: 2px solid #f0d070;
+}
+footer img {
+  height: 20px;
+  margin: 0 1px;
+  vertical-align: middle;
+}
+#sol {
+  display: block;
+  width: 100px;
+  height: auto;
+  margin-top: 10px;
+}
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
+}
+.calendar div {
+  padding: 10px;
+  background: #333;
+  color: #f0d070;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+.calendar div:hover {
+  background: #444;
+}
+.selected-date {
+  background: #f0d070 !important;
+  color: #000 !important;
+}
+.scissor-button {
+  background: #f0d070;
+  color: #000;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  padding: 12px;
+}
+.history {
+  margin-top: 20px;
+  background: #222;
+  padding: 10px;
+  border-radius: 6px;
+}
+.history h3 {
+  margin-top: 0;
+  color: #f0d070;
+}
+.history ul {
+  list-style: none;
+  padding-left: 0;
+  color: #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.history ul::-webkit-scrollbar {
+  width: 6px;
+}
+.history ul::-webkit-scrollbar-thumb {
+  background: #f0d070;
+  border-radius: 3px;
+}
+.user-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-menu button {
+  background: none;
+  border: none;
+  color: #f0d070;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.user-menu ul {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #222;
+  border: 1px solid #f0d070;
+  list-style: none;
+  margin: 0;
+  padding: 5px 0;
+  display: none;
+  border-radius: 4px;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.user-menu ul.visible {
+  display: block;
+}
+
+.barbershop-card {
+  background: #222;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+.barbershop-card img {
+  width: 140px;
+  height: 140px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #f0d070;
+}
+nav a {
+  color: #f0d070;
+  margin: 0px;
+  text-decoration: none;
+  font-size: 16px;
+}
+input,
+select,
+button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+}
+input,
+select {
+  background-color: #222;
+  color: #f0d070;
+}
+button {
+  background: #f0d070;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+.hidden {
+  display: none !important;
+}

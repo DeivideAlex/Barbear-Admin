@@ -1,0 +1,119 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agendamento Barbearia</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 30px;
+      "
+    >
+      <div style="display: flex; align-items: center; gap: 10px">
+        <img
+          class="logo"
+          src="LOGOTIPO - STYLER PLANNER.png"
+          alt="Logo"
+          onclick="showScreen('barbershop-screen')"
+        />
+      </div>
+
+      <nav
+        id="main-nav"
+        style="display: flex; gap: 40px; font-size: 18px; font-weight: 500"
+      >
+        <span
+          onclick="showScreen('barbershop-screen')"
+          style="cursor: pointer; color: #f0d070"
+          >Barbearia</span
+        >
+        <span onclick="tryShowServices()">Serviços</span>
+        <span
+          onclick="showScreen('calendar-screen')"
+          style="cursor: pointer; color: #f0d070"
+          >Agendamento</span
+        >
+      </nav>
+
+      <div class="user-menu" id="user-menu" style="position: relative">
+        <button onclick="window.location.href='admin.html'">👤</button>
+      </div>
+    </header>
+
+    <div class="container active" id="barbershop-screen">
+      <h2>Escolha a Barbearia</h2>
+      <div class="barbershop-list">
+        <div
+          class="barbershop-card"
+          onclick="selectBarbershop('Barbearia do João')"
+        >
+          <img src="D.jpeg" />
+          <div><strong>Barbearia do João</strong><br />Rua Alpha, 123</div>
+        </div>
+      </div>
+      </div>
+    <div class="container" id="services-screen">
+      <h2>Escolha os Serviços</h2>
+      <div class="services-list" id="services-list"></div>
+      <div class="total-container" id="total-valor">Total: R$ 0,00</div>
+      <div id="services-buttons">
+        <button onclick="goToCalendar()">Próximo</button>
+        <button onclick="showScreen('barbershop-screen')">Voltar</button>
+      </div>
+    </div>
+
+    <div class="container" id="calendar-screen">
+      <h2>Escolha a Data</h2>
+      <input type="date" id="data-agendamento" onchange="onDateSelected()" />
+      <div id="horarios-section" style="display: none">
+        <h2>Escolha o Horário</h2>
+        <div class="time-slots" id="time-slots"></div>
+        <button onclick="goToConfirmation()">Próximo</button>
+        <button onclick="showScreen('services-screen')">Voltar</button>
+      </div>
+    </div>
+
+    <div class="container" id="confirmation-screen">
+      <h2>Confirme seu Agendamento</h2>
+      <input type="text" id="nome" placeholder="Nome completo" />
+      <input type="text" id="telefone" placeholder="Telefone celular" />
+      <label><input type="checkbox" id="whatsapp" /> É WhatsApp?</label>
+      <input type="email" id="email" placeholder="E-mail" />
+      <button onclick="finalizarAgendamento()">Confirmar Agendamento</button>
+      <button onclick="showScreen('calendar-screen')">Voltar</button>
+    </div>
+
+    <div class="container hidden" id="appointments-screen">
+      <h2>Meus Agendamentos</h2>
+      <div id="appointments-list"></div>
+      <button onclick="showScreen('barbershop-screen')">Voltar</button>
+    </div>
+
+    <footer>
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        "
+      >
+        <img src="Sun.gif" id="sol" alt="Sol girando" />
+        <p style="margin: 0">
+          Todos os direitos reservados © 2025 |
+          <img src="instagram.png" alt="Instagram" />
+          <img src="gmail.png" alt="Email" />
+          <img src="facebook.png" alt="Facebook" />
+        </p>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
